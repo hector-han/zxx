@@ -1,0 +1,31 @@
+{
+	"use": "clean_text_cust",
+	"useForSentiment": "clean_text",
+	"ignore": 
+		["the", "a", "to", "and", "of", "in", "is", "with", "us", "on", "for", "as", "will", "you", "that", "are", "this", "not", "be", "we", "from", "it", "by", "via", "but", "but", "he", "he", "up", "at", "if", "an", "could", "would"]
+	,
+	
+	"transform": {
+		"fears": "fear",
+		"tariffs": "tariff",
+		"tradewar": "trade war",
+		"has": "have",
+		"trump's": "trump",
+		"stocks": "stock",
+		"farmers": "farmer",
+		"markets": "market",
+		"chinese": "china",
+		"china's": "china",
+		"economic": "economy",
+		"usa": "america",
+		"american": "america",
+		"products": "product",
+		"started": "start",
+		"starting": "start",
+		"said": "say",
+		"says": "say"
+	},
+	
+	"maxWord": 30,
+	"frequencyThreshold": 3000
+}
