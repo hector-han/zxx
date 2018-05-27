@@ -58,9 +58,10 @@ if __name__ == "__main__":
         w_cluster = util.get_clusters_from_linkage(Z, lst_words, util.conf['num_of_cluster'])
         for c in w_cluster:
             print(c)
-        plt.show()
         all_date = util.load_data(afterfilename)
         util.split_tweets_into_clusters(all_date, w_cluster, '.\output\cluster')
+        plt.show()
+        
     elif flag == 4:
         all_date = util.load_data(plot_data_file)
         plttm.plot_sentiment(all_date)
