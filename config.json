@@ -1,8 +1,12 @@
 {
+	"stage": 4,
 	"use": "clean_text_cust",
-	"useForSentiment": "clean_text",
+	"sentimentMethod": "baseonscore",
+	"neutralThreshold": 0.66,
+	"plot_data_file": "./output/cluster/cluster_2.txt",
+	
 	"ignore": 
-		["the", "a", "to", "and", "of", "in", "is", "with", "us", "on", "for", "as", "will", "you", "that", "are", "this", "not", "be", "we", "from", "it", "by", "via", "but", "but", "he", "he", "up", "at", "if", "an", "could", "would"]
+		["the", "a", "to", "and", "of", "in", "is", "with", "us", "on", "for", "as", "will", "you", "that", "are", "this", "not", "be", "we", "from", "it", "by", "via", "but", "but", "he", "he", "up", "at", "if", "an", "could", "would", "trade", "war", "u", "", "eu", "w", "say", "start", "going", "one", "may", "think", "amid", "make", "he's"]
 	,
 	
 	"transform": {
@@ -23,9 +27,11 @@
 		"started": "start",
 		"starting": "start",
 		"said": "say",
-		"says": "say"
+		"says": "say",
+		"winning": "win"
 	},
 	
 	"maxWord": 30,
+	"num_of_cluster": 3,
 	"frequencyThreshold": 3000
 }

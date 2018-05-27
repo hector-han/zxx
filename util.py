@@ -7,6 +7,9 @@ import numpy as np
 import csv
 from scipy.cluster.hierarchy import fcluster
 
+from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
+analyser = SentimentIntensityAnalyzer()
+
 conf = config.Conf("config.json").getConf()
 stop_words = stopwords.words('english')
 
@@ -79,12 +82,11 @@ def clean_tweet_customise(lst_tweet):
         word =  word.strip("'")
         if word in stop_words:
             continue
+        if word in conf['transform']:
+            word = conf['transform'][word]
         if word in conf['ignore']:
             continue
-        if word in conf['transform']:
-            lst_after.append(conf['transform'][word])
-        else:
-            lst_after.append(word)
+        lst_after.append(word)
     return lst_after
 
 def write_json2file(raw_data, outputfile, isdict = True):
@@ -107,8 +109,13 @@ def trans_input_clean(inputfile, outputfile):
             text = tmp["text"]
             clean_text, clean_text_cust = clean_tweet(text)
 
+            snt1 = analyser.polarity_scores(text)
+            snt2 = analyser.polarity_scores(clean_text)
+            snt3 = analyser.polarity_scores(clean_text_cust)
+            score = {"text": snt1, "clean_text": snt2, "clean_text_cust": snt3}
+
             datetime = tmp["datetime"]
-            res = {"user_id": user_id, "clean_text":clean_text, "clean_text_cust":clean_text_cust, "datetime":datetime}
+            res = {"user_id": user_id,"text": text, "clean_text": clean_text, "clean_text_cust": clean_text_cust, "datetime": datetime,"score": score}
 
             if user_id in raw_data:
                 found = False
@@ -228,4 +235,22 @@ def split_tweets_into_clusters(all_data, w_cluster, folder):
     for i in range(num_of_cluster):
         filename = os.path.join(folder, 'cluster_{}.txt'.format(i))
         write_json2file(tmp[i], filename, isdict=False)
+
+def combine_folder_remove_dup(loc_folder, out_filename = None):
+    basefolder = os.path.dirname(loc_folder)
+    if not out_filename:
+        out_filename = 'all_tweets.txt'
+    out_filename = os.path.join(basefolder, out_filename)
+    all_data = {}
+    for file in os.listdir(loc_folder):
+        with open(os.path.join(loc_folder, file)) as infile:
+            for line in infile:
+                tmp = json.loads(line)
+                user_id = int(tmp['user_id'])
+                if user_id in all_data:
+                    if tmp not in all_data[user_id]:
+                        all_data[user_id].append(tmp)
+                else:
+                    all_data[user_id] = [tmp]
+    write_json2file(all_data, out_filename)
 
