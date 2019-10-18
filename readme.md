@@ -18,7 +18,7 @@ CREATE TABLE `tweet` (
   KEY `idx_datetime` (`datetime`),
   KEY `idx_nbr_retweet` (`nbr_retweet`),
   KEY `idx_nbr_favorite` (`nbr_favorite`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE `user` (
   `user_id` varchar(64) NOT NULL DEFAULT '' COMMENT 'user id',
@@ -27,5 +27,5 @@ CREATE TABLE `user` (
   `avatar` varchar(256) NOT NULL DEFAULT '',
   PRIMARY KEY (`user_id`),
   KEY `idx_sname` (`screen_name`(191))
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 ```

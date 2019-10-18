@@ -44,11 +44,9 @@ def save_tweet(conn, data):
     with conn.cursor() as cursor:
         cursor.execute("select count(*) from tweet where tweet_id={}".format(data['ID']))
         row = cursor.fetchone()
-
-    if row[0] > 0:
-        logging.error('already have tweet, id={}'.format(data['ID']))
-        cursor.close()
-        return
+        if row[0] > 0:
+            logging.error('already have tweet, id={}'.format(data['ID']))
+            return
     try:
         with conn.cursor() as cursor:
             for key, val in data.items():
@@ -78,10 +76,9 @@ def save_user(conn, data):
     with conn.cursor() as cursor:
         cursor.execute("select count(*) from user where user_id={}".format(data['ID']))
         row = cursor.fetchone()
-    if row[0] > 0:
-        logging.error('already have user, id={}'.format(data['ID']))
-        cursor.close()
-        return
+        if row[0] > 0:
+            logging.error('already have user, id={}'.format(data['ID']))
+            return
     try:
         with conn.cursor() as cursor:
             for key, val in data.items():
@@ -102,25 +99,31 @@ if __name__ == '__main__':
         logging.error("usage: import_data.py dirpath(eg 20180101-20180101)")
         exit(-1)
     dir = sys.argv[1]
-    tweet_dir = os.path.join(dir, 'Data/tweet')
-    if not os.path.exists(tweet_dir):
-        logging.error('{}, no such file'.format(tweet_dir))
+    tweet_file = os.path.join(dir, 'all_tweets.jl')
+    if not os.path.exists(tweet_file):
+        logging.error('{}, no such file'.format(tweet_file))
         exit(-1)
-    user_dir = os.path.join(dir, 'Data/user')
-    if not os.path.exists(user_dir):
-        logging.error('{}, no such file'.format(user_dir))
+    user_file = os.path.join(dir, 'all_users.jl')
+    if not os.path.exists(user_file):
+        logging.error('{}, no such file'.format(user_file))
         exit(-1)
-    conn =  pymysql.connect(**mysql_config)
-    for file in os.listdir(tweet_dir):
-        if file.startswith('.'):
-            continue
-        with open(os.path.join(tweet_dir, file), encoding='utf-8') as fp:
-            data = json.load(fp)
-            save_tweet(conn, data)
-    for file in os.listdir(user_dir):
-        if file.startswith('.'):
-            continue
-        with open(os.path.join(user_dir, file), encoding='utf-8') as fp:
-            data = json.load(fp)
-            save_user(conn, data)
+    conn = pymysql.connect(**mysql_config)
+    with open(tweet_file, encoding='utf-8') as f:
+        line = f.readline()
+        while line:
+            try:
+                data = json.loads(line)
+                save_tweet(conn, data)
+            except :
+                print(line)
+            line = f.readline()
+    with open(user_file, encoding='utf-8') as f:
+        line = f.readline()
+        while line:
+            try:
+                data = json.loads(line)
+                save_user(conn, data)
+            except:
+                print(line)
+            line = f.readline()
     conn.close()
