@@ -2,7 +2,7 @@
 CREATE TABLE `tweet` (
   `tweet_id` varchar(64) NOT NULL DEFAULT '' COMMENT 'tweet id',
   `user_id` varchar(64) NOT NULL DEFAULT '' COMMENT 'user id',
-  `text` varchar(1024) NOT NULL DEFAULT '' COMMENT 'tweet 内容',
+  `text` varchar(2000) NOT NULL DEFAULT '' COMMENT 'tweet 内容',
   `hash_tags` varchar(512) NOT NULL DEFAULT '' COMMENT 'hash tag 列表',
   `url` varchar(64) NOT NULL DEFAULT '' COMMENT 'url',
   `nbr_retweet` int(9) unsigned NOT NULL DEFAULT '0' COMMENT 'number of retweetk',

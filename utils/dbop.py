@@ -55,3 +55,83 @@ def update_label(file_url, annotations):
     db.commit()
     cursor.close()
     db.close()
+
+
+def query_summary(start_time, end_time):
+    """
+    根据起止时间查询每天的发布量
+    :param start_time:
+    :param end_time:
+    :return:
+    """
+    sql = 'select date_format(datetime, "%%Y%%m%%d") as dt, count(1) as cnt ' \
+          'from tweet where datetime between %s and %s group by dt;'
+    db = db_pool.connection()
+    dates = []
+    values = []
+    with db.cursor() as cursor:
+        cursor.execute(sql, (start_time, end_time))
+        rows = cursor.fetchall()
+        if rows and len(rows) > 1:
+            dates = [row[0] for row in rows]
+            values = [row[1] for row in rows]
+    db.close()
+    return dates, values
+
+
+def query_hash_tags(start_time, end_time):
+    """
+    根据起止时间，查询出现的hashtag的次数
+    :param start_time:
+    :param end_time:
+    :return:
+    """
+    sql = 'select hash_tags from tweet where datetime between %s and %s and hash_tags<>"";'
+    db = db_pool.connection()
+    word_frequency = {}
+    rows = None
+    with db.cursor() as cursor:
+        cursor.execute(sql, (start_time, end_time))
+        rows = cursor.fetchall()
+    db.close()
+    if rows:
+        for row in rows:
+            for word in row[0].split(','):
+                word = word.replace('#', '').lower()
+                if word not in word_frequency:
+                    word_frequency[word] = 0
+                word_frequency[word] += 1
+    return word_frequency
+
+
+def query_tweets_cnt(start_time, end_time):
+    sql = 'select count(1) from tweet where datetime between %s and %s;'
+    db = db_pool.connection()
+    ret = None
+    with db.cursor() as cursor:
+        cursor.execute(sql, (start_time, end_time))
+        ret = cursor.fetchone()
+    db.close()
+    if ret:
+        return ret[0]
+    return 0
+
+
+tweets_fields = ['id', 'date_time', 'user_id', 'text', 'hash_tags', 'url', 'nbr_retweet', 'nbr_favorite', 'nbr_reply']
+def row_to_bootstraptable(row):
+    result = {}
+    for i, field in enumerate(tweets_fields):
+        result[field] = row[i]
+    return result
+
+
+def query_tweets_list(start_time, end_time, limit, offset, sorted_by='nbr_retweet'):
+    sql = 'select tweet_id, date_format(datetime, "%%Y%%m%%d") as df, user_id, text, hash_tags, url, nbr_retweet, nbr_favorite, nbr_reply' \
+          ' from tweet where datetime between %s and %s order by {} desc limit {} offset {};'.format(sorted_by, limit, offset)
+    db = db_pool.connection()
+    rows = []
+    with db.cursor() as cursor:
+        cursor.execute(sql, (start_time, end_time))
+        rows = [row_to_bootstraptable(row) for row in cursor.fetchall()]
+    db.close()
+    return rows
