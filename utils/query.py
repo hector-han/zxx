@@ -10,20 +10,20 @@ from utils.dbop import query_summary, query_hash_tags, query_tweets_cnt, query_t
 file_path = os.path.dirname(__file__)
 
 
-
 class QuerySummary(BaseHandler):
     @tornado.web.authenticated
     def get(self):
         start_time = self.get_argument('start_time')
         end_time = self.get_argument('end_time')
+        cate = self.get_argument('cate')
         print(start_time, end_time)
-        dates, values = query_summary(start_time, end_time)
+        dates, values = query_summary(start_time, end_time, cate)
         if len(dates) == 0:
             response = {'status': -1, 'msg': '没有数据'}
         else:
             data = {'dates': dates, 'values': values}
             response ={'status': 0, 'msg': 'success', 'data': data}
-            hash_tags_frequency = query_hash_tags(start_time, end_time)
+            hash_tags_frequency = query_hash_tags(start_time, end_time, cate)
             if len(hash_tags_frequency) > 0:
                 wc = WordCloud(background_color='white', width=360, height=360)
                 wc.generate_from_frequencies(hash_tags_frequency)
@@ -43,6 +43,7 @@ class QuerySummary(BaseHandler):
 
         self.write(json.dumps(response))
 
+
 tweets_fields = ['id', 'date_time', 'user_id', 'text', 'hash_tags', 'url', 'nbr_retweet', 'nbr_favorite']
 class QueryAllTweets(BaseHandler):
     @tornado.web.authenticated
@@ -53,11 +54,12 @@ class QueryAllTweets(BaseHandler):
         limit = int(self.get_argument('limit'))
         offset = int(self.get_argument('offset'))
         sorted_by = self.get_argument('sorted_by')
+        cate = self.get_argument('cate')
 
-        total = query_tweets_cnt(start_time, end_time)
+        total = query_tweets_cnt(start_time, end_time, cate)
         if total == 0:
             response = {'total': 0}
         else:
-            rows = query_tweets_list(start_time, end_time, limit, offset, sorted_by)
+            rows = query_tweets_list(start_time, end_time, limit, offset, sorted_by, cate)
             response = {'total': total, 'rows': rows}
         self.write(json.dumps(response))

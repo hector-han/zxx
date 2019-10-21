@@ -22,6 +22,15 @@
 <div>
 	起始日期：<input type="text" id="start_time" value="20180601">
 	结束日期：<input type="text" id="end_time" value="20180701">
+	<select id="cate_selector">
+		<option value ="-2">全部类别</option>
+		<option value ="-1">tweet没有文本</option>
+		<option value="0">类别0</option>
+		<option value="1">类别1</option>
+		<option value="2">类别2</option>
+		<option value="3">类别3</option>
+		<option value="4">类别4</option>
+	</select>
 	<button type="button" id="btn_summary">查询汇总</button>
 	<button type="button" id="btn_detail">查询详细</button>
 </div>
@@ -69,6 +78,7 @@
 			limit: params.limit,
 			offset: params.offset,
 			start_time: start_time,
+			cate: $("#cate_selector").val(),
 			end_time: end_time,
 			sorted_by: sorted_by
 		};
@@ -132,7 +142,8 @@
 			async : true,
 			data: {
 				start_time: start_time,
-				end_time: end_time
+				end_time: end_time,
+				cate: $("#cate_selector").val()
 			},
 			success: function(resp) {
 				if (resp.status == 0) {

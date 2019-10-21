@@ -30,7 +30,7 @@ def extract_hash_tag(text):
     return ret[:511]
 
 
-def build_tweet_content(data):
+def build_tweet_content(data, extra=None):
     data['text'] = filter_emoji(data['text'])
     data['text'] = data['text'].replace('\\', '')
     for key, val in data.items():
@@ -43,10 +43,14 @@ def build_tweet_content(data):
         data['has_media'] = 0
     data['medias'] = ','.join(data['medias'])
 
-    return data['ID'], '{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}'.format(data['ID'], data['user_id'], data['text'].replace('\n', ' ')[:1999], data['hash_tags'],
+    row = '{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}'.format(data['ID'], data['user_id'], data['text'].replace('\n', ' ')[:1999], data['hash_tags'],
                                            data['url'], data['nbr_retweet'], data['nbr_favorite'], data['nbr_reply'],
                                            data['datetime'], data['has_media'], data['medias'], data['is_reply'],
                                            data['is_retweet'])
+    if extra:
+        for ele in extra:
+            row = row + '\t' + ele
+    return data['ID'], row
 
 
 def build_user_content(data):
