@@ -5,8 +5,9 @@ def clean_tweet(tweet):
     # remove \uxxxx
     tmp = tweet.replace('\u2019', "'").lower()
     tmp = re.sub("(http.*\u2026)|(http.*\/[\S]+)|(pic\.twitter.*\/[\S]+)", "", tmp)
-    lst_tweet = re.sub("(@[A-Za-z0-9]+)|([^A-Za-z0-9 '\t])", " ", tmp).split()
-    return ' '.join(lst_tweet)
+    lst_tweet = tmp.replace('@', '').replace('#', '').replace('\n', '')
+    lst_tweet = bytes(lst_tweet, 'utf-8').decode('utf-8', 'ignore')
+    return lst_tweet
 
 
 def load_all_tweets(tweet_file):

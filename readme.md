@@ -22,14 +22,15 @@ CREATE TABLE `tweet` (
   `is_reply` tinyint(4) NOT NULL DEFAULT '0' COMMENT '0-false, 1-true',
   `is_retweet` tinyint(4) NOT NULL DEFAULT '0' COMMENT '0-false, 1-true',
   `topic` tinyint(4) NOT NULL DEFAULT '-1' COMMENT 'topic indicator',
+  `score` float not null default 0.0,
   `clean_text` varchar(2000) NOT NULL DEFAULT '' COMMENT 'tweet 内容',
   PRIMARY KEY (`tweet_id`),
-  KEY `idx_uid` (`user_id`),
   KEY `idx_datetime` (`datetime`),
   KEY `idx_nbr_retweet` (`nbr_retweet`),
   KEY `idx_nbr_favorite` (`nbr_favorite`),
-  KEY `idx_topic` (`topic`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+  KEY `idx_topic` (`topic`),
+  KEY `idx_score` (`score`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `user` (
   `user_id` varchar(64) NOT NULL DEFAULT '' COMMENT 'user id',

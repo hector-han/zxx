@@ -61,10 +61,10 @@ def build_user_content(data):
 
 if __name__ == '__main__':
     dir = r'D:\code\github\data'
-    tweet_file = os.path.join(dir, 'all_tweets.jl')
+    tweet_file = os.path.join(dir, 'all_tweets_china.jl')
     tweet_sql_file = os.path.join(dir, 'all_tweets.sql')
-    user_file = os.path.join(dir, 'all_users.jl')
-    user_sql_file = os.path.join(dir, 'all_users.sql')
+    # user_file = os.path.join(dir, 'all_users.jl')
+    # user_sql_file = os.path.join(dir, 'all_users.sql')
 
     tweets_id_saved = set()
     with open(tweet_file, encoding='utf-8') as f, open(tweet_sql_file, 'w', encoding='utf-8') as fout:
@@ -81,17 +81,17 @@ if __name__ == '__main__':
                 print(line)
             line = f.readline()
 
-    users_id_saved = set()
-    with open(user_file, encoding='utf-8') as f, open(user_sql_file, 'w', encoding='utf-8') as fout:
-        line = f.readline()
-        while line:
-            try:
-                data = json.loads(line)
-                id, content = build_user_content(data)
-                if id not in users_id_saved:
-                    fout.write(content)
-                    fout.write('\n')
-                    users_id_saved.add(id)
-            except Exception as e:
-                print(line)
-            line = f.readline()
+    # users_id_saved = set()
+    # with open(user_file, encoding='utf-8') as f, open(user_sql_file, 'w', encoding='utf-8') as fout:
+    #     line = f.readline()
+    #     while line:
+    #         try:
+    #             data = json.loads(line)
+    #             id, content = build_user_content(data)
+    #             if id not in users_id_saved:
+    #                 fout.write(content)
+    #                 fout.write('\n')
+    #                 users_id_saved.add(id)
+    #         except Exception as e:
+    #             print(line)
+    #         line = f.readline()

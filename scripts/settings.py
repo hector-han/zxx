@@ -135,7 +135,11 @@ stop_words = [
 "just",
 "don",
 "should",
-"now"
+"now",
+"china",
+"trade",
+"war",
+"tradewar"
 ]
 
 stop_words = set(stop_words)
