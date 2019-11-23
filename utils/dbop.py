@@ -57,7 +57,7 @@ def update_label(file_url, annotations):
     db.close()
 
 
-def query_summary(start_time, end_time, cate='-2'):
+def query_summary(start_time, end_time, cate='-2', sentiment="-1"):
     """
     根据起止时间查询每天的发布量
     :param start_time:
@@ -66,10 +66,16 @@ def query_summary(start_time, end_time, cate='-2'):
     """
     if cate == '-2':
         sql = 'select date_format(datetime, "%%Y%%m%%d") as dt, count(1) as cnt ' \
-              'from tweet where datetime between %s and %s group by dt;'
+              'from tweet where datetime between %s and %s '
     else:
         sql = 'select date_format(datetime, "%%Y%%m%%d") as dt, count(1) as cnt ' \
-              'from tweet where datetime between %s and %s and topic={} group by dt;'.format(cate)
+              'from tweet where datetime between %s and %s and topic={} '.format(cate)
+
+    if sentiment != "-1":
+        sql += " and sentiment='{}' ".format(sentiment)
+
+    sql += "group by dt;"
+    print(sql)
     db = db_pool.connection()
     dates = []
     values = []
@@ -114,11 +120,15 @@ def query_hash_tags(start_time, end_time, cate):
     return word_frequency
 
 
-def query_tweets_cnt(start_time, end_time, cate):
+def query_tweets_cnt(start_time, end_time, cate, sentiment="-1"):
     if cate == '-2':
-        sql = 'select count(1) from tweet where datetime between %s and %s;'
+        sql = 'select count(1) from tweet where datetime between %s and %s '
     else:
-        sql = 'select count(1) from tweet where datetime between %s and %s and topic={};'.format(cate)
+        sql = 'select count(1) from tweet where datetime between %s and %s and topic={} '.format(cate)
+
+    if sentiment != "-1":
+        sql += " and sentiment='{}';".format(sentiment)
+
     db = db_pool.connection()
     ret = None
     with db.cursor() as cursor:
@@ -130,7 +140,7 @@ def query_tweets_cnt(start_time, end_time, cate):
     return 0
 
 
-tweets_fields = ['id', 'date_time', 'user_id', 'text', 'hash_tags', 'url', 'nbr_retweet', 'nbr_favorite', 'nbr_reply']
+tweets_fields = ['id', 'date_time', 'user_id', 'text', 'hash_tags', 'url', 'nbr_retweet', 'nbr_favorite', 'nbr_reply', 'sentiment']
 def row_to_bootstraptable(row):
     result = {}
     for i, field in enumerate(tweets_fields):
@@ -138,14 +148,18 @@ def row_to_bootstraptable(row):
     return result
 
 
-def query_tweets_list(start_time, end_time, limit, offset, sorted_by='nbr_retweet', cate='-2'):
+def query_tweets_list(start_time, end_time, limit, offset, sorted_by='nbr_retweet', cate='-2', sentiment="-1"):
     if cate == '-2':
-        sql = 'select tweet_id, date_format(datetime, "%%Y%%m%%d") as df, user_id, text, hash_tags, url, nbr_retweet, nbr_favorite, nbr_reply' \
-          ' from tweet where datetime between %s and %s order by {} desc limit {} offset {};'.format(sorted_by, limit, offset)
+        sql = 'select tweet_id, date_format(datetime, "%%Y%%m%%d") as df, user_id, text, hash_tags, url, nbr_retweet, nbr_favorite, nbr_reply, sentiment' \
+          ' from tweet where datetime between %s and %s '
     else:
-        sql = 'select tweet_id, date_format(datetime, "%%Y%%m%%d") as df, user_id, text, hash_tags, url, nbr_retweet, nbr_favorite, nbr_reply' \
-              ' from tweet where datetime between %s and %s and topic={} order by {} desc limit {} offset {};'.format(cate, sorted_by,
-                                                                                                         limit, offset)
+        sql = 'select tweet_id, date_format(datetime, "%%Y%%m%%d") as df, user_id, text, hash_tags, url, nbr_retweet, nbr_favorite, nbr_reply, sentiment' \
+              ' from tweet where datetime between %s and %s and topic={} '.format(cate)
+    if sentiment != "-1":
+        sql += " and sentiment='{}' ".format(sentiment)
+
+    sql += " order by {} desc limit {} offset {};".format(sorted_by, limit, offset)
+
     db = db_pool.connection()
     rows = []
     with db.cursor() as cursor:

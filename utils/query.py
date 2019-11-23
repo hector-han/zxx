@@ -16,8 +16,9 @@ class QuerySummary(BaseHandler):
         start_time = self.get_argument('start_time')
         end_time = self.get_argument('end_time')
         cate = self.get_argument('cate')
+        sentiment = self.get_argument('sentiment')
         print(start_time, end_time)
-        dates, values = query_summary(start_time, end_time, cate)
+        dates, values = query_summary(start_time, end_time, cate, sentiment)
         if len(dates) == 0:
             response = {'status': -1, 'msg': '没有数据'}
         else:
@@ -55,11 +56,12 @@ class QueryAllTweets(BaseHandler):
         offset = int(self.get_argument('offset'))
         sorted_by = self.get_argument('sorted_by')
         cate = self.get_argument('cate')
+        sentiment = self.get_argument('sentiment')
 
-        total = query_tweets_cnt(start_time, end_time, cate)
+        total = query_tweets_cnt(start_time, end_time, cate, sentiment)
         if total == 0:
             response = {'total': 0}
         else:
-            rows = query_tweets_list(start_time, end_time, limit, offset, sorted_by, cate)
+            rows = query_tweets_list(start_time, end_time, limit, offset, sorted_by, cate, sentiment)
             response = {'total': total, 'rows': rows}
         self.write(json.dumps(response))
