@@ -24,12 +24,14 @@ CREATE TABLE `tweet` (
   `topic` tinyint(4) NOT NULL DEFAULT '-1' COMMENT 'topic indicator',
   `score` float not null default 0.0,
   `clean_text` varchar(2000) NOT NULL DEFAULT '' COMMENT 'tweet 内容',
+  `sentiment` varchar(10) NOT NULL DEFAULT '' COMMENT '情感态度',
   PRIMARY KEY (`tweet_id`),
   KEY `idx_datetime` (`datetime`),
   KEY `idx_nbr_retweet` (`nbr_retweet`),
   KEY `idx_nbr_favorite` (`nbr_favorite`),
   KEY `idx_topic` (`topic`),
-  KEY `idx_score` (`score`)
+  KEY `idx_score` (`score`),
+  KEY `idx_senti` (`sentiment`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `user` (
@@ -41,3 +43,5 @@ CREATE TABLE `user` (
   KEY `idx_sname` (`screen_name`(191))
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 ```
+
+scrapy crawl TweetScraper -a query='("trade war" OR #tradewar) lang:en since:2018-03-20 until:2018-04-01' -a crawl_user=True

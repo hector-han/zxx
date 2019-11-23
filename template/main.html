@@ -20,17 +20,27 @@
 
 <body>
 <div>
-	起始日期：<input type="text" id="start_time" value="20180601">
-	结束日期：<input type="text" id="end_time" value="20180701">
+	起始日期：<input type="text" id="start_time" value="20180320">
+	结束日期：<input type="text" id="end_time" value="20190601">
 	<select id="cate_selector">
 		<option value ="-2">全部类别</option>
 		<option value ="-1">tweet没有文本</option>
 		<option value="0">类别0</option>
 		<option value="1">类别1</option>
 		<option value="2">类别2</option>
+		<option value="3">类别3</option>
+		<option value="4">类别4</option>
+	</select>
+	<select id="sentiment_selector">
+		<option value ="-1">全部</option>
+		<option value="POSITIVE">正向</option>
+		<option value="CENTRAL">中性</option>
+		<option value="NEGATIVE">负向</option>
 	</select>
 	<button type="button" id="btn_summary">查询汇总</button>
 	<button type="button" id="btn_detail">查询详细</button>
+	<br>
+	总量:<label id="show_label">0</label>
 </div>
 
 <div class="t2_box_con" style="padding:0px 10px 0px;">
@@ -78,11 +88,19 @@
 			offset: params.offset,
 			start_time: start_time,
 			cate: $("#cate_selector").val(),
+			sentiment: $("#sentiment_selector").val(),
 			end_time: end_time,
 			sorted_by: sorted_by
 		};
 	}
 
+	function sum(arr) {
+		var s = 0;
+		for (var i=arr.length-1; i>=0; i--) {
+			s += arr[i];
+		}
+		return s;
+	}
 
 	var initTable = function() {
 		$('#tweet_list').bootstrapTable({
@@ -119,6 +137,7 @@
 				{field:'nbr_retweet',title:'转发次数',align:"center",valign:'middle',width:50},
 				{field:'nbr_favorite',title:'喜欢次数',align:"center",valign:'middle',width:50},
 				{field:'nbr_reply',title:'评论次数',align:"center",valign:'middle',width:50},
+				{field:'sentiment',title:'情感态度',align:"center",valign:'middle',width:50},
 			],
 		})
 	}
@@ -142,11 +161,13 @@
 			data: {
 				start_time: start_time,
 				end_time: end_time,
-				cate: $("#cate_selector").val()
+				cate: $("#cate_selector").val(),
+				sentiment: $("#sentiment_selector").val(),
 			},
 			success: function(resp) {
 				if (resp.status == 0) {
 					data = resp.data
+					$("#show_label").text("" + sum(data.values))
 					var option = {
 						color: ['#ffa82f'],
 		        /* 图像四周边距设置 */

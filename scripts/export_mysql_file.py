@@ -37,7 +37,7 @@ def build_tweet_content(data, extra=None):
         if type(val) == bool:
             data[key] = int(val)
     data['hash_tags'] = extract_hash_tag(data['text'])
-    if 'medias' not in data:
+    if 'medias' not in data or not data['medias']:
         data['medias'] = []
     if 'has_media' not in data:
         data['has_media'] = 0
