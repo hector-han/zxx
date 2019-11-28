@@ -65,28 +65,30 @@ def query_summary(start_time, end_time, cate='-2', sentiment="-1"):
     :return:
     """
     if cate == '-2':
-        sql = 'select date_format(datetime, "%%Y%%m%%d") as dt, count(1) as cnt ' \
+        sql = 'select date_format(datetime, "%%Y%%m%%d") as dt, sentiment, count(1) as cnt ' \
               'from tweet where datetime between %s and %s '
     else:
-        sql = 'select date_format(datetime, "%%Y%%m%%d") as dt, count(1) as cnt ' \
+        sql = 'select date_format(datetime, "%%Y%%m%%d") as dt, sentiment, count(1) as cnt ' \
               'from tweet where datetime between %s and %s and topic={} '.format(cate)
 
     if sentiment != "-1":
         sql += " and sentiment='{}' ".format(sentiment)
 
-    sql += "group by dt;"
-    print(sql)
+    sql += "group by dt, sentiment;"
+    print(sql, start_time, end_time)
     db = db_pool.connection()
-    dates = []
-    values = []
+    data = {}
     with db.cursor() as cursor:
         cursor.execute(sql, (start_time, end_time))
         rows = cursor.fetchall()
-        if rows and len(rows) > 1:
-            dates = [row[0] for row in rows]
-            values = [row[1] for row in rows]
+        # print(rows)
+        if rows:
+            for row in rows:
+                if row[0] not in data:
+                    data[row[0]] = {'POSITIVE': 0, 'CENTRAL': 0, 'NEGATIVE': 0}
+                data[row[0]][row[1]] = row[2]
     db.close()
-    return dates, values
+    return data
 
 
 def query_hash_tags(start_time, end_time, cate):

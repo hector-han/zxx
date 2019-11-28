@@ -96,8 +96,11 @@
 
 	function sum(arr) {
 		var s = 0;
-		for (var i=arr.length-1; i>=0; i--) {
-			s += arr[i];
+		for (var i=arr.length-1; i>=0; i--){
+			innerarr = arr[i].data
+			for (var j=innerarr.length-1; j>=0; j--) {
+				s += innerarr[j];
+			}
 		}
 		return s;
 	}
@@ -167,7 +170,7 @@
 			success: function(resp) {
 				if (resp.status == 0) {
 					data = resp.data
-					$("#show_label").text("" + sum(data.values))
+					$("#show_label").text("" + sum(data.series))
 					var option = {
 						color: ['#ffa82f'],
 		        /* 图像四周边距设置 */
@@ -186,11 +189,12 @@
 						  top: 0,
 						  //图例文字的样式
 						  textStyle:{
-						  	color:'#6ab2ec',
+						  	color:'#000000',
 						  },
 					    // 与series中每个name一一对应
-					    data:['发布量']
+					    data: data.legends
 				      },
+
 					 	/* 鼠标悬浮时显示数据 */
 					 	tooltip : {
 							trigger: 'axis',
@@ -205,37 +209,29 @@
             			},
 						yAxis: {
 							type: 'value', // 'value' 数值轴，适用于连续数据。
-							splitLine: {
-                 			show: true,
+							//splitLine: {
+                 		//	show: true,
                  			//  改变轴线颜色
-                 			lineStyle: {
+                 		//	lineStyle: {
                      		// 使用深浅的间隔色
-                     			color: ['#132a6e']
-                 			}
-             			}
+                     	//		color: ['#132a6e']
+                 		//	}
+             			//}
 						},
 
-						series: [{
-            	name:'发布量',
-            	data: data.values,
-            	type: 'line',
-            	symbol: 'circle',
-            	// 设置折点大小
-            	symbolSize: 10,
-            	// 设置为光滑曲线
-            	smooth: true
-						},]
+						series: data.series
 					}
-				myChart.setOption(option)
+				myChart.setOption(option, true)
 
 				//refresh word cloud
 				$("#hash_tags_wc").attr("src", resp.img_src)
 				} //end if status = 0
+				else{
+					alert(resp.msg)
+				}
 
 			},
-			error: function(data) {
-				alert("请求出错");
-			}
+
 		});
 	}
 
