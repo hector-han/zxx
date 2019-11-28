@@ -9,6 +9,56 @@ from utils.dbop import query_summary, query_hash_tags, query_tweets_cnt, query_t
 
 file_path = os.path.dirname(__file__)
 
+map1 = {
+    'POSITIVE': '积极',
+    'CENTRAL': '中性',
+    'NEGATIVE': '消极',
+}
+
+color_config = {
+    'POSITIVE': '#FF0000', # 红色
+    'CENTRAL': '#8B008B', #黑色
+    'NEGATIVE': '#0000FF', #蓝色
+}
+
+def build_series(values, sentiment):
+    series_data = {
+        'name': map1[sentiment],
+        'type': 'line',
+        'itemStyle': {
+            'normal': {
+                'color': color_config[sentiment],
+                'lineStyle': {
+                    'color': color_config[sentiment]
+                }
+            }
+        },
+        'symbol': None,
+        'data': values
+    }
+
+    return series_data
+
+
+def build_resp(data, sentiment):
+    dates = list(sorted(data.keys()))
+    legends = []
+    series = []
+    if sentiment == "-1":
+        for senti in ['POSITIVE', 'CENTRAL', 'NEGATIVE']:
+            legends.append(map1[senti])
+            values = []
+            for date in dates:
+                values.append(data[date][senti])
+            series.append(build_series(values, senti))
+    else:
+        legends.append(map1[sentiment])
+        values = []
+        for date in dates:
+            values.append(data[date][sentiment])
+        series.append(build_series(values, sentiment))
+    return dates, legends, series
+
 
 class QuerySummary(BaseHandler):
     @tornado.web.authenticated
@@ -18,12 +68,13 @@ class QuerySummary(BaseHandler):
         cate = self.get_argument('cate')
         sentiment = self.get_argument('sentiment')
         print(start_time, end_time)
-        dates, values = query_summary(start_time, end_time, cate, sentiment)
-        if len(dates) == 0:
+        db_data = query_summary(start_time, end_time, cate, sentiment)
+        if len(db_data.keys()) == 0:
             response = {'status': -1, 'msg': '没有数据'}
         else:
-            data = {'dates': dates, 'values': values}
-            response ={'status': 0, 'msg': 'success', 'data': data}
+            dates, legends, series = build_resp(db_data, sentiment)
+            data = {'dates': dates, 'legends': legends, 'series': series}
+            response = {'status': 0, 'msg': 'success', 'data': data}
             hash_tags_frequency = query_hash_tags(start_time, end_time, cate)
             if len(hash_tags_frequency) > 0:
                 wc = WordCloud(background_color='white', width=360, height=360)
