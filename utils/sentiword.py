@@ -78,10 +78,10 @@ def get_stc_sentiment(pos_val):
 def cal_senti(scores):
 
     if scores[0] + scores[1] == 0:
-        return 'CENTRAL'
+        return 'NEUTRAL'
 
     if scores[2] / (scores[0] + scores[1]) > 15:
-        return 'CENTRAL'
+        return 'NEUTRAL'
 
     if scores[1] > scores[0]:
         return 'NEGATIVE'

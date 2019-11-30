@@ -2,7 +2,7 @@
 mysql_config = {
     'host': '127.0.0.1',
     'port': 3306,
-    'user': 'hhkhan',
+    'user': 'root',
     'password': '19910601ke',
     'db': 'zxxtweet',
     'charset': 'utf8mb4'
@@ -139,19 +139,25 @@ stop_words = [
     "would",
 "now",
 "china",
+"chinas",
 "trade",
 "war",
 "tradewar",
 "us",
+"usa",
 "american",
 "america",
 "via",
     "|",
     "—",
+    "-",
     "&",
     "u",
     "ha",
-    "wa"
+    "wa",
+    'us-china',
+    '-',
+    '–'
 ]
 
 stop_words = set(stop_words)

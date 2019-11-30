@@ -13,5 +13,5 @@ class VocabParams(object):
 ch2en = {
     '正': 'POSITIVE',
     '负': 'NEGATIVE',
-    '中': 'CENTRAL',
+    '中': 'NEUTRAL',
 }
