@@ -27,7 +27,7 @@ class GeneralTextCNN(object):
 
         self.vocab_size = dictionary.dictionary_size
         self.label_size = dictionary.label_size
-        self.default_label = "__label__CENTRAL"
+        self.default_label = "__label__NEUTRAL"
         self.seq_len = dictionary.max_seq_len
 
         self.embedding_size = embedding_size

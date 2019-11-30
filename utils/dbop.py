@@ -85,7 +85,7 @@ def query_summary(start_time, end_time, cate='-2', sentiment="-1"):
         if rows:
             for row in rows:
                 if row[0] not in data:
-                    data[row[0]] = {'POSITIVE': 0, 'CENTRAL': 0, 'NEGATIVE': 0}
+                    data[row[0]] = {'POSITIVE': 0, 'NEUTRAL': 0, 'NEGATIVE': 0}
                 data[row[0]][row[1]] = row[2]
     db.close()
     return data

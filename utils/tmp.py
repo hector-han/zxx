@@ -1,4 +1,6 @@
 import pandas as pd
+import numpy as np
+
 
 def export_to_json_file(data_frame: pd.DataFrame, file_name: str, lines=True):
     """
@@ -40,13 +42,13 @@ def get_cate(data):
 def create_label_xlsx():
     map1 = {
         'POSITIVE': '正',
-        'CENTRAL': '中',
+        'NEUTRAL': '中',
         'NEGATIVE': '负',
     }
     data_dir = r'D:\code\github\zxx\data'
-    final_file = data_dir + r'\final.jl'
+    final_file = data_dir + r'\all_tweets_vader_senti.jl'
     df_final = read_from_json_file(final_file)
-    df_final = df_final[['ID', 'text', 'senti', 'is_label', 'choose', 'lda5']]
+    df_final = df_final[['ID', 'text', 'senti', 'is_label', 'lda5', 'choose']]
     df_final = df_final[df_final['choose'] == 1]
     df_final.ID = df_final.ID.apply(lambda x: str(x))
     df_final.senti = df_final.senti.apply(lambda x: map1[x])
@@ -62,5 +64,30 @@ def create_label_xlsx():
     excel_writer.save()
 
 
+def set_choose():
+    label_file = r'D:\code\github\zxx\data\选择出来的标注数据.xlsx'
+    senti_file = r'D:\code\github\zxx\data\all_tweets_vader_senti.jl'
+    df_label = pd.read_excel(label_file)
+    df_label = df_label[['tid', 'label']]
+    df_label['tid'] = df_label['tid'].apply(np.int64)
+    print(df_label.shape, len(df_label['tid'].unique()))
+    df_senti = pd.read_json(senti_file, orient='records', lines=True)
+    df_senti['datetime'] = df_senti['datetime'].astype(str)
+    print(df_senti.shape, len(df_senti['ID'].unique()))
+    df_senti = df_senti.join(df_label.set_index('tid'), on='ID', how='left')
+    print(df_senti.shape, len(df_senti['ID'].unique()))
+
+    df_senti['rd'] = np.random.random(size=df_senti.shape[0])
+    df_senti['is_label'] = df_senti['label'].notna()
+    print(sum(df_senti['is_label'].astype(int)))
+    df_senti['choose'] = (df_senti['is_label']) | (df_senti['rd'] < 0.08)
+    df_senti['senti'] = df_senti['label'].where(df_senti['is_label'], df_senti['senti'])
+    df_senti = df_senti.drop(['rd'], axis=1)
+    print(sum(df_senti['choose'].astype(int)))
+    df_senti.to_json(senti_file, orient='records', lines=True)
+
+
+
 if __name__ == '__main__':
     create_label_xlsx()
+    # set_choose()

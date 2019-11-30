@@ -15,10 +15,23 @@ def export_to_excel_file(data_frame: pd.DataFrame, file_name: str):
 
 
 def jl_2_excel():
-    excel_file = '../../data/tmp.xlsx'
+
+    def get_cate_and_score(data):
+        cate = ''
+        maxscore = 0.0
+        for key, val in data.items():
+            if val > maxscore:
+                maxscore = val
+                cate = key
+        return cate
+
+    excel_file = '../../data/选择出来的标注数据.xlsx'
     jl_file = '../../data/情感标注-汇总.jl'
     df_data = pd.read_json(jl_file, orient='records', encoding='utf-8', lines=True)
-    df_data['content'] = df_data['content'].apply(lambda x: ' '.join(x))
+    df_lda5 = read_from_json_file(r'../../data/all_tweets_lda_5.jl')
+    df_lda5['cate'] = df_lda5['lda5'].apply(lambda x: get_cate_and_score(x))
+    df_lda5 = df_lda5[['ID', 'cleaned', 'cate', 'text']]
+    df_data = df_data.join(df_lda5.set_index('ID'), on='tid', how='inner')
     df_data['tid'] = df_data['tid'].astype(str)
     export_to_excel_file(df_data, excel_file)
 
@@ -59,13 +72,13 @@ def excel_to_jl():
                         word_cnt[w] = 0
                     word_cnt[w] += 1
                 key_words = row['关键词'] if pd.notna(row['关键词']) else ''
-                tmp = {'tid': tid, 'content': content, 'label': label, 'cate': cate, 'keywords': key_words}
+                tmp = {'tid': tid, 'label': label, 'keywords': key_words}
                 fout.write(json.dumps(tmp))
                 fout.write('\n')
 
     for key, val in distribute.items():
         words = sorted(val.items(), key=lambda x: x[1], reverse=True)
-        print('{}前10的词：{}'.format(key, '|'.join([str(e) for e in words[0:10]])))
+        print('{}前20的词：{}'.format(key, '|'.join([str(e) for e in words[0:20]])))
 
 
 def split_train_valid():
@@ -141,9 +154,9 @@ def join_data():
 if __name__ == '__main__':
     # 第一步，先把excel数据转换为json line数据
     # excel_to_jl()
-    # jl_2_excel()
+    jl_2_excel()
     # 第二步， 拆分成训练集合验证集
     # join_data()
     # split_train_valid()
     # 第三步， 构造词典
-    build_dictionary()
+    # build_dictionary()

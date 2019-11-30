@@ -39,10 +39,10 @@ def build_tweet_content(data, extra=None):
     data['hash_tags'] = extract_hash_tag(data['text'])
     if 'medias' not in data or not data['medias']:
         data['medias'] = []
-    if 'has_media' not in data:
+    if 'has_media' not in data or not data['has_media']:
         data['has_media'] = 0
     data['medias'] = ','.join(data['medias'])
-
+    data['has_media'] = int(data['has_media'])
     row = '{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}'.format(data['ID'], data['user_id'], data['text'].replace('\n', ' ')[:1999], data['hash_tags'],
                                            data['url'], data['nbr_retweet'], data['nbr_favorite'], data['nbr_reply'],
                                            data['datetime'], data['has_media'], data['medias'], data['is_reply'],

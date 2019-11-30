@@ -32,7 +32,7 @@ CREATE TABLE `tweet` (
   KEY `idx_topic` (`topic`),
   KEY `idx_score` (`score`),
   KEY `idx_senti` (`sentiment`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE `user` (
   `user_id` varchar(64) NOT NULL DEFAULT '' COMMENT 'user id',

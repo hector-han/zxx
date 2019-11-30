@@ -139,19 +139,25 @@ stop_words = [
     "would",
 "now",
 "china",
+"chinas",
 "trade",
 "war",
 "tradewar",
 "us",
+"usa",
 "american",
 "america",
 "via",
     "|",
     "—",
+    "-",
     "&",
     "u",
     "ha",
-    "wa"
+    "wa",
+    'us-china',
+    '-',
+    '–'
 ]
 
 stop_words = set(stop_words)

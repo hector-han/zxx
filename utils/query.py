@@ -11,13 +11,13 @@ file_path = os.path.dirname(__file__)
 
 map1 = {
     'POSITIVE': '积极',
-    'CENTRAL': '中性',
+    'NEUTRAL': '中性',
     'NEGATIVE': '消极',
 }
 
 color_config = {
     'POSITIVE': '#FF0000', # 红色
-    'CENTRAL': '#8B008B', #黑色
+    'NEUTRAL': '#8B008B', #黑色
     'NEGATIVE': '#0000FF', #蓝色
 }
 
@@ -40,12 +40,22 @@ def build_series(values, sentiment):
     return series_data
 
 
+def _get_percentage_value(data):
+    for key, val in data.items():
+        sum = 0
+        for senti in val:
+            sum += val[senti]
+        for senti in val:
+            val[senti] = val[senti] / sum
+    return data
+
+
 def build_resp(data, sentiment):
     dates = list(sorted(data.keys()))
     legends = []
     series = []
     if sentiment == "-1":
-        for senti in ['POSITIVE', 'CENTRAL', 'NEGATIVE']:
+        for senti in ['POSITIVE', 'NEUTRAL', 'NEGATIVE']:
             legends.append(map1[senti])
             values = []
             for date in dates:
@@ -72,7 +82,10 @@ class QuerySummary(BaseHandler):
         if len(db_data.keys()) == 0:
             response = {'status': -1, 'msg': '没有数据'}
         else:
+            # if sentiment == "-1":
+            #     db_data = _get_percentage_value(db_data)
             dates, legends, series = build_resp(db_data, sentiment)
+
             data = {'dates': dates, 'legends': legends, 'series': series}
             response = {'status': 0, 'msg': 'success', 'data': data}
             hash_tags_frequency = query_hash_tags(start_time, end_time, cate)

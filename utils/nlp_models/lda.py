@@ -67,8 +67,8 @@ def build_model(raw_file, ret_file):
     common_dictionary = Dictionary(common_texts)
     common_corpus = [common_dictionary.doc2bow(text) for text in common_texts]
     print('begin to train')
-    lda_model = LdaModel(common_corpus, id2word=common_dictionary, num_topics=k)
-    pprint(lda_model.print_topics(num_words=15))
+    lda_model = LdaModel(common_corpus, id2word=common_dictionary, num_topics=k, random_state=13)
+    pprint(lda_model.print_topics(num_words=20))
     print('\nPerplexity: ', lda_model.log_perplexity(common_corpus))
 
     with open(ret_file, 'w', encoding='utf-8') as fout:
@@ -103,10 +103,10 @@ def export_mysql(infile, outfile):
             tweet['score'] = score
             if cate not in cate2id:
                 cate2id[cate] = []
-            if tweet['choose'] == 1:
+            if tweet['choose']:
                 cate2id[cate].append(key)
 
-            _, content = build_tweet_content(tweet, extra=[str(cate), str(score), tweet['cleaned'], tweet['senti']])
+            _, content = build_tweet_content(tweet, extra=[str(cate), str(score), tweet['cleaned'].replace("\\", ""), tweet['senti']])
             fout.write(content)
             fout.write('\n')
 
@@ -132,9 +132,11 @@ if __name__ == '__main__':
     cleand_file = data_dir + r'\all_tweets_cleaned.jl'
     # get_clean_tweet(tweet_file, cleand_file)
 
-    # tweet_lda_jlfile = data_dir + r'\all_tweets_lda_5.jl'
-    tweet_lda_jlfile = data_dir + r'\final.jl'
+    tweet_lda_jlfile = data_dir + r'\all_tweets_lda_5.jl'
+    # tweet_lda_jlfile = data_dir + r'\final.jl'
     # build_model(cleand_file, tweet_lda_jlfile)
 
-    tweet_sql_file = data_dir + r'\all_tweets_cate_5.sql'
-    export_mysql(tweet_lda_jlfile, tweet_sql_file)
+    # tweet_senti_jlfile = data_dir + r'\all_tweets_senti.jl'
+    tweet_senti_jlfile = data_dir + r'\all_tweets_vader_senti.jl'
+    tweet_sql_file = data_dir + r'\all_tweets_vader_cate_5.sql'
+    export_mysql(tweet_senti_jlfile, tweet_sql_file)
