@@ -54,7 +54,10 @@ def build_resp(data):
         legends.append(map1[topic])
         values = []
         for date in dates:
-            values.append(data[date][topic])
+            if topic in data[date]:
+                values.append(data[date][topic])
+            else:
+                values.append(0)
         series.append(build_series(values, topic))
 
     return dates, legends, series
