@@ -98,7 +98,7 @@ def query_summary_new(start_time, end_time, sentiment="-1"):
     :param end_time:
     :return:
     """
-    sql = 'select date_format(datetime, "%%Y%%m%%d") as dt, sentiment, count(1) as cnt ' \
+    sql = 'select date_format(datetime, "%%Y%%m%%d") as dt, topic, count(1) as cnt ' \
               'from tweet where datetime between %s and %s '
 
     if sentiment != "-1":
