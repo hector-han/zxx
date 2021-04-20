@@ -73,7 +73,7 @@ class QuerySummaryNew(BaseHandler):
         else:
             # if sentiment == "-1":
             #     db_data = _get_percentage_value(db_data)
-            dates, legends, series = build_resp(db_data, sentiment)
+            dates, legends, series = build_resp(db_data)
 
             data = {'dates': dates, 'legends': legends, 'series': series}
             response = {'status': 0, 'msg': 'success', 'data': data}
