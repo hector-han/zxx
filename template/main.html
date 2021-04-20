@@ -38,6 +38,7 @@
 		<option value="NEGATIVE">负向</option>
 	</select>
 	<button type="button" id="btn_summary">查询汇总</button>
+	<button type="button" id="btn_new">新查询</button>
 	<button type="button" id="btn_detail">查询详细</button>
 	<br>
 	总量:<label id="show_label">0</label>
@@ -50,6 +51,26 @@
 		hash tags 词云
 		<img src="" id="hash_tags_wc"/>
 	</div>
+</div>
+
+
+<div>
+	起始日期：<input type="text" id="start_time_2" value="20180320">
+	结束日期：<input type="text" id="end_time_2" value="20190601">
+	<select id="sentiment_selector_2">
+		<option value ="-1">全部</option>
+		<option value="POSITIVE">正向</option>
+		<option value="NEUTRAL">中性</option>
+		<option value="NEGATIVE">负向</option>
+	</select>
+	<button type="button" id="btn_summary_2">查询</button>
+	<br>
+	总量:<label id="show_label_2">0</label>
+</div>
+
+<div class="t2_box_con" style="padding:0px 10px 0px;">
+	<!-- 此处加载图像 -->
+	<div id="my_chart_2" style="float:left; width: 80%; height: 360px;"></div>
 </div>
 
 <br>
@@ -173,35 +194,35 @@
 					$("#show_label").text("" + sum(data.series))
 					var option = {
 						color: ['#ffa82f'],
-		        /* 图像四周边距设置 */
-				    grid:{
-		        	left:100,
-		          top:30,
-		          right:50,
-		          bottom:30
+		                        /* 图像四周边距设置 */
+				            grid:{
+		                        	left:100,
+		                              top:30,
+		                              right:50,
+		                              bottom:30
 						},
 					 	/* 图例说明 */
 					 	legend: {
 							// 图例排项 vertical-"竖向"; horizontal-"横向"
-					     orient: 'horizontal',
+					           orient: 'horizontal',
 							// 图例组件离容器左侧的距离
-						  right : 50	,
-						  top: 0,
-						  //图例文字的样式
-						  textStyle:{
-						  	color:'#000000',
-						  },
-					    // 与series中每个name一一对应
-					    data: data.legends
-				      },
+						      right : 50	,
+						      top: 0,
+						      //图例文字的样式
+						      textStyle:{
+						      	color:'#000000',
+						      },
+					            // 与series中每个name一一对应
+					            data: data.legends
+				          },
 
 					 	/* 鼠标悬浮时显示数据 */
 					 	tooltip : {
 							trigger: 'axis',
 							axisPointer : {            // 坐标轴指示器，坐标轴触发有效
 								type : 'shadow'        // 默认为直线，可选为：'line' | 'shadow'
-						   }
-					   },
+						     }
+					     },
 						xAxis: {
                 			type: 'category', // category为一级分类,适用于离散的类目数据
                 			boundaryGap: false,  // 无间隙
@@ -210,13 +231,13 @@
 						yAxis: {
 							type: 'value', // 'value' 数值轴，适用于连续数据。
 							//splitLine: {
-                 		//	show: true,
-                 			//  改变轴线颜色
-                 		//	lineStyle: {
-                     		// 使用深浅的间隔色
-                     	//		color: ['#132a6e']
-                 		//	}
-             			//}
+                         		//	show: true,
+                         			//  改变轴线颜色
+                         		//	lineStyle: {
+                             		// 使用深浅的间隔色
+                             	//		color: ['#132a6e']
+                         		//	}
+                     			//}
 						},
 
 						series: data.series
@@ -234,8 +255,80 @@
 
 		});
 	}
-
 	$("#btn_summary").click(clickSummary);
+
+	var myChartNew = echarts.init(document.getElementById('my_chart_2'));
+	var clickSummaryNew = function() {
+		var start_time = $("#start_time_2").val()
+		var end_time = $("#end_time_2").val()
+		$.ajax({
+			url: "/query/summary_new",
+			dataType: "json",
+			type: "get",
+			async : true,
+			data: {
+				start_time: start_time,
+				end_time: end_time,
+				sentiment: $("#sentiment_selector_2").val(),
+			},
+			success: function(resp) {
+				if (resp.status == 0) {
+					data = resp.data
+					$("#show_label_2").text("" + sum(data.series))
+					var option = {
+						color: ['#ffa82f'],
+		                        /* 图像四周边距设置 */
+				        grid:{
+		                        	left:100,
+		                              top:30,
+		                              right:50,
+		                              bottom:30
+						},
+					 	/* 图例说明 */
+					 	legend: {
+							// 图例排项 vertical-"竖向"; horizontal-"横向"
+					           orient: 'horizontal',
+							// 图例组件离容器左侧的距离
+						      right : 50	,
+						      top: 0,
+						      //图例文字的样式
+						      textStyle:{
+						      	color:'#000000',
+						      },
+					            // 与series中每个name一一对应
+					            data: data.legends
+				          },
+
+					 	/* 鼠标悬浮时显示数据 */
+					 	tooltip : {
+							trigger: 'axis',
+							axisPointer : {            // 坐标轴指示器，坐标轴触发有效
+								type : 'shadow'        // 默认为直线，可选为：'line' | 'shadow'
+						     }
+					     },
+						xAxis: {
+                			type: 'category', // category为一级分类,适用于离散的类目数据
+                			boundaryGap: false,  // 无间隙
+                			data: data.dates
+            			},
+						yAxis: {
+							type: 'value',
+						},
+
+						series: data.series
+					}
+				myChartNew.setOption(option, true)
+
+				} //end if status = 0
+				else{
+					alert(resp.msg)
+				}
+
+			},
+
+		});
+	}
+	$("#btn_summary_2").click(clickSummaryNew);
 
 </script>
 

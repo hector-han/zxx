@@ -7,6 +7,7 @@ import tornado.options
 
 from utils.login import MainHandler, LoginHandler
 from utils.query import QuerySummary, QueryAllTweets
+from utils.query_topic import QuerySummaryNew
 
 settings = {
     'template_path': 'template',
@@ -21,6 +22,7 @@ if __name__ == "__main__":
         (r"/", MainHandler),
         (r"/login", LoginHandler),
         (r"/query/summary", QuerySummary),
+        (r"/query/summary_new", QuerySummaryNew),
         (r"/query/all_tweets", QueryAllTweets),
     ], **settings)
     http_server = tornado.httpserver.HTTPServer(app)

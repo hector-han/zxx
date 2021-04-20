@@ -91,6 +91,37 @@ def query_summary(start_time, end_time, cate='-2', sentiment="-1"):
     return data
 
 
+def query_summary_new(start_time, end_time, sentiment="-1"):
+    """
+    根据起止时间查询每天的发布量
+    :param start_time:
+    :param end_time:
+    :return:
+    """
+    sql = 'select date_format(datetime, "%%Y%%m%%d") as dt, sentiment, count(1) as cnt ' \
+              'from tweet where datetime between %s and %s '
+
+    if sentiment != "-1":
+        sql += " and sentiment='{}' ".format(sentiment)
+
+    sql += "group by dt, topic;"
+    print(sql, start_time, end_time)
+    db = db_pool.connection()
+    data = {}
+    with db.cursor() as cursor:
+        cursor.execute(sql, (start_time, end_time))
+        rows = cursor.fetchall()
+        # print(rows)
+        if rows:
+            for row in rows:
+                if row[0] not in data:
+                    data[row[0]] = {}
+                t = str(row[1])
+                data[row[0]][t] = row[2]
+    db.close()
+    return data
+
+
 def query_hash_tags(start_time, end_time, cate):
     """
     根据起止时间，查询出现的hashtag的次数
